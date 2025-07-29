@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   # Dịch vụ ứng dụng ASP.NET Core
