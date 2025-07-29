@@ -1,38 +1,19 @@
 pipeline {
     agent any
 
-
-    options {
-        skipDefaultCheckout()
-    }
-
     stages {
-        // Stage 1: Checkout code một cách thủ công
-        stage('Checkout') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Cleaning workspace and checking out code manually...'
-                // Xóa sạch thư mục làm việc cũ để đảm bảo không còn file rác
-                cleanWs() 
-                
-                // Chạy lệnh git clone thủ công
-                git branch: 'master', url: 'https://github.com/SpringMuch/DocumentManagement.git'
+                echo 'Building all services defined in docker-compose...'
+                sh 'docker-compose build'
             }
         }
-
-        // Các stage tiếp theo sẽ chạy như bình thường
-        stage('Build & Deploy') {
+        stage('Deploy Services') {
             steps {
-                echo 'Building and deploying services...'
+                echo 'Starting all services...'
                 sh 'docker-compose down'
-                sh 'docker-compose build'
                 sh 'docker-compose up -d'
             }
-        }
-    }
-    
-    post {
-        always {
-            echo 'Pipeline finished.'
         }
     }
 }

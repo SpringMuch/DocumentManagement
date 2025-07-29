@@ -20,6 +20,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.WebHost.UseUrls("http://*:8080", "https://*:8081");
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
