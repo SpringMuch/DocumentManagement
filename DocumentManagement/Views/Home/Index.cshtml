@@ -1,0 +1,85 @@
+﻿@using System.Security.Claims
+@model DocumentManagement.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Trang Chủ";
+}
+
+<div class="max-w-4xl mx-auto">
+
+    <div class="mt-4">
+        <form asp-controller="Documents" asp-action="Search" method="get">
+            <input name="keyword" class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Tìm kiếm văn bản theo tên..." type="text" />
+        </form>
+    </div>
+
+    <div class="mt-4 flex flex-col sm:flex-row gap-4">
+        <a asp-controller="Documents" asp-action="Inbox" class="flex-1 bg-blue-600 rounded-lg text-white p-4 flex items-center justify-between cursor-pointer hover:bg-blue-700 transition-colors">
+            <div>
+                <div class="text-xs font-semibold">Văn Bản Đến</div>
+                <div class="text-3xl font-bold leading-none mt-1">@Model.TotalIncoming</div>
+                <div class="text-xs mt-0.5">Chưa xử lý: @Model.UnreadIncoming</div>
+            </div>
+            <div>
+                <img alt="Icon inbox" aria-hidden="true" class="w-10 h-10" src="https://storage.googleapis.com/a1aa/image/740e81c6-a839-4616-787a-f16989d533ae.jpg" />
+            </div>
+        </a>
+        <a asp-controller="Documents" asp-action="Sent" class="flex-1 bg-green-600 rounded-lg text-white p-4 flex items-center justify-between cursor-pointer hover:bg-green-700 transition-colors">
+            <div>
+                <div class="text-xs font-semibold">Văn Bản Đi</div>
+                <div class="text-3xl font-bold leading-none mt-1">@Model.TotalSent</div>
+                <div class="text-xs mt-0.5">Tổng số: @Model.TotalSent</div>
+            </div>
+            <div>
+                <img alt="Icon paper airplane" aria-hidden="true" class="w-10 h-10" src="https://storage.googleapis.com/a1aa/image/6ec4c883-0340-4329-83aa-39bdf9b08c19.jpg" />
+            </div>
+        </a>
+    </div>
+
+    <section class="mt-6 bg-white border border-gray-200 rounded-lg p-4">
+        <h2 class="text-sm font-semibold mb-3">Văn Bản Gần Đây</h2>
+
+        @if (Model.RecentDocuments.Any())
+        {
+            @foreach (var doc in Model.RecentDocuments)
+            {
+                <a asp-controller="Documents" asp-action="Details" asp-route-id="@doc.Id" class="block mb-4 p-2 rounded-md hover:bg-gray-50">
+                    <article>
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xs font-semibold leading-tight text-gray-800">@doc.Title</h3>
+                            @if (doc.SenderId == int.Parse(User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier)))
+                            {
+                                <span class="text-xs text-green-600 bg-green-100 rounded-full px-2 py-0.5 font-medium">Đã gửi</span>
+                            }
+                            else
+                            {
+                                <span class="text-xs text-blue-500 bg-blue-100 rounded-full px-2 py-0.5 font-medium">Mới</span>
+                            }
+                        </div>
+                        <div class="text-[10px] text-gray-600 mt-1 flex flex-wrap gap-2 items-center">
+                            <div class="flex items-center gap-1">
+                                <i class="fas fa-file-alt text-[8px]"></i>
+                                <span>Số: (chưa có)</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <i class="fas fa-calendar-alt text-[8px]"></i>
+                                <span>@doc.CreatedAt?.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <i class="fas fa-building text-[8px]"></i>
+                                <span>@doc.Sender?.Workplace</span>
+                            </div>
+                        </div>
+                    </article>
+                </a>
+            }
+        }
+        else
+        {
+            <p class="text-xs text-gray-500 text-center">Không có văn bản nào gần đây.</p>
+        }
+
+        <div class="mt-4 text-center">
+            <a class="text-xs text-blue-600 hover:underline" asp-controller="Documents" asp-action="Inbox">Xem tất cả văn bản</a>
+        </div>
+    </section>
+</div>

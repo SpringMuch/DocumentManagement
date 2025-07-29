@@ -1,0 +1,28 @@
+﻿@using System.Security.Claims
+
+@* Kiểm tra xem người dùng đã được xác thực (đăng nhập) hay chưa *@
+@if (User.Identity != null && User.Identity.IsAuthenticated)
+{
+    @* Nếu đã đăng nhập, hiển thị lời chào và nút Đăng xuất *@
+    <div class="flex items-center space-x-3">
+        <span class="text-sm text-gray-700 hidden sm:block">
+            Xin chào, <strong>@User.FindFirst("FullName")?.Value</strong>!
+        </span>
+        <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="text-sm text-blue-600 hover:underline focus:outline-none">Đăng xuất</button>
+        </form>
+    </div>
+}
+else
+{
+    @* Nếu chưa đăng nhập, hiển thị link Đăng ký và Đăng nhập *@
+    <div class="flex items-center space-x-4">
+        <a asp-controller="Account" asp-action="Register" class="text-sm text-gray-600 hover:text-blue-700">
+            Đăng ký
+        </a>
+        <a asp-controller="Account" asp-action="Login" class="text-sm font-semibold text-blue-600 hover:text-blue-700 bg-blue-100 px-3 py-1 rounded-md">
+            Đăng nhập
+        </a>
+    </div>
+}

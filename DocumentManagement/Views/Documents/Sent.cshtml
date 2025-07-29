@@ -1,0 +1,81 @@
+﻿@model DocumentManagement.ViewModels.SentViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Văn Bản Đã Gửi";
+
+    // Helper để lấy màu cho tag độ khẩn
+    string GetUrgencyColor(string levelName) => levelName switch
+    {
+        "Khẩn" => "bg-[#F87171] text-white",
+        "Hỏa tốc" => "bg-red-700 text-white",
+        "Quan trọng" => "bg-[#F59E0B] text-white",
+        _ => "bg-[#60A5FA] text-white"
+    };
+}
+
+<div class="max-w-[900px] mx-auto">
+    <form asp-action="Sent" method="get" class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
+        <label for="search" class="relative flex-1 text-[#9CA3AF]">
+            <input asp-for="Keyword" type="text" placeholder="Tìm kiếm văn bản..." class="w-full rounded border border-[#E5E7EB] bg-white py-2 pl-9 pr-3 text-[14px] text-[#1E1E2D] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-blue-600" />
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true"></i>
+        </label>
+        <select asp-for="StatusId" asp-items="@Model.StatusList" class="rounded border border-[#E5E7EB] bg-white py-2 px-3 text-[14px] focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <option value="">Tất cả trạng thái</option>
+        </select>
+        <button type="submit" class="flex items-center justify-center gap-2 rounded bg-[#2563EB] px-5 py-2 text-white transition-colors hover:bg-[#1D4ED8]"><i class="fas fa-filter"></i> Lọc</button>
+    </form>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="flex items-center justify-between rounded-lg border border-[#3B82F6] bg-white px-4 py-3"><div><p class="text-[12px] text-[#6B7280]">Tổng số</p><p class="mt-1 font-semibold text-[18px]">@Model.TotalCount</p></div><i class="fas fa-paper-plane text-[#3B82F6] text-[20px]"></i></div>
+        <div class="flex items-center justify-between rounded-lg border border-[#22C55E] bg-white px-4 py-3"><div><p class="text-[12px] text-[#6B7280]">Đã gửi</p><p class="mt-1 font-semibold text-[18px]">@Model.SentCount</p></div><i class="fas fa-check-circle text-[#22C55E] text-[20px]"></i></div>
+        <div class="flex items-center justify-between rounded-lg border border-[#FBBF24] bg-white px-4 py-3"><div><p class="text-[12px] text-[#6B7280]">Đang xử lý</p><p class="mt-1 font-semibold text-[18px]">@Model.InProgressCount</p></div><i class="fas fa-clock text-[#FBBF24] text-[20px]"></i></div>
+        <div class="flex items-center justify-between rounded-lg border border-[#8B5CF6] bg-white px-4 py-3"><div><p class="text-[12px] text-[#6B7280]">Đã xử lý/Phản hồi</p><p class="mt-1 font-semibold text-[18px]">@Model.RespondedCount</p></div><i class="fas fa-reply text-[#8B5CF6] text-[20px]"></i></div>
+    </div>
+
+    <div class="rounded-lg bg-white p-5">
+        <div class="mb-4 flex items-center justify-between">
+            <h2 class="font-semibold text-[14px]">Danh Sách Văn Bản Đã Gửi</h2>
+        </div>
+
+        <ul class="space-y-6">
+            @foreach (var doc in Model.Documents)
+            {
+                <li>
+                    <a asp-action="Details" asp-route-id="@doc.Id">
+                        <h3 class="font-semibold text-[14px] flex items-center gap-2 hover:text-blue-600">
+                            @doc.Title
+                            @if (doc.UrgencyLevel != null)
+                            {
+                                <span class="@(GetUrgencyColor(doc.UrgencyLevel.LevelName)) rounded px-2 py-[2px] text-[10px] font-semibold">
+                                    @doc.UrgencyLevel.LevelName
+                                </span>
+                            }
+                        </h3>
+                    </a>
+                    <p class="mt-1 text-[12px] text-[#6B7280] flex flex-wrap gap-3">
+                        <span><i class="fas fa-calendar-alt mr-1"></i> @doc.CreatedAt?.ToString("dd/MM/yyyy")</span>
+                    </p>
+                    <p class="mt-1 text-[12px] text-[#6B7280]">@doc.Content</p>
+                    <div class="mt-2 flex items-center justify-between gap-2 text-[12px] text-[#6B7280]">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-users"></i> Gửi đến:
+                            @{
+                                var recipients = doc.DocumentRecipients.Take(2).Select(r => r.Recipient.FullName).ToList();
+                                var remainingCount = doc.DocumentRecipients.Count - recipients.Count;
+                            }
+                            <span>@string.Join(", ", recipients)</span>
+                            @if (remainingCount > 0)
+                            {
+                                <span class="text-blue-500">và @remainingCount người khác</span>
+                            }
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="far fa-clock"></i> @doc.CreatedAt?.ToString("HH:mm")
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</div>

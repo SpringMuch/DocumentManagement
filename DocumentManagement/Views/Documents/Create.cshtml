@@ -1,0 +1,83 @@
+﻿@model DocumentManagement.ViewModels.CreateDocumentViewModel
+@{
+    ViewData["Title"] = "Tạo Văn Bản";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<body class="bg-[#F9FAFB] text-[#111827]">
+
+    <main class="max-w-3xl mx-auto mt-6 px-4 sm:px-6 lg:px-8">
+        <form asp-controller="Documents" asp-action="Create" method="post" enctype="multipart/form-data" class="bg-white rounded-md border border-gray-200 p-5 space-y-4 text-xs text-gray-600">
+            @Html.AntiForgeryToken()
+            <h2 class="text-gray-900 text-sm font-semibold mb-2">Soạn văn bản mới</h2>
+
+            <div asp-validation-summary="All" class="text-red-600 text-xs"></div>
+
+            <div>
+                <label asp-for="RecipientIds" class="block mb-1 font-normal text-[11px] text-gray-600">Người nhận</label>
+                <select asp-for="RecipientIds" asp-items="@Model.RecipientList" class="w-full border border-gray-300 rounded px-2 py-1 text-xs text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-600" multiple></select>
+                <small class="text-gray-400 text-[10px]">Giữ phím Ctrl (hoặc Command trên Mac) để chọn nhiều người.</small>
+            </div>
+
+            <div>
+                <label asp-for="Document.Title" class="block mb-1 font-normal text-[11px] text-gray-600">Tiêu đề</label>
+                <input asp-for="Document.Title" class="w-full border border-gray-300 rounded px-2 py-1 text-xs text-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-600" placeholder="Nhập tiêu đề văn bản..." />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label asp-for="Document.UrgencyLevelId" class="block mb-1 font-normal text-[11px] text-gray-600">Độ khẩn</label>
+                    <select asp-for="Document.UrgencyLevelId" asp-items="@Model.UrgencyLevelList" class="w-full border border-gray-300 rounded px-2 py-1 text-xs"><option value="">-- Chọn --</option></select>
+                </div>
+                <div>
+                    <label asp-for="Document.StatusId" class="block mb-1 font-normal text-[11px] text-gray-600">Tình trạng</label>
+                    <select asp-for="Document.StatusId" asp-items="@Model.StatusList" class="w-full border border-gray-300 rounded px-2 py-1 text-xs"><option value="">-- Chọn --</option></select>
+                </div>
+            </div>
+
+            <div>
+                <label asp-for="Document.Content" class="block mb-1 font-normal text-[11px] text-gray-600">Nội dung</label>
+                <div class="border border-gray-300 rounded">
+                    <div class="flex space-x-3 border-b border-gray-200 px-2 py-1 text-gray-500 text-xs">
+                        <i class="fas fa-bold"></i><i class="fas fa-italic"></i><i class="fas fa-underline"></i>
+                    </div>
+                    <textarea asp-for="Document.Content" class="w-full resize-none px-2 py-2 text-xs text-gray-600 placeholder:text-gray-400 focus:outline-none" placeholder="Nhập nội dung văn bản của bạn..." rows="7"></textarea>
+                </div>
+            </div>
+
+            <div>
+                <label class="block mb-1 font-normal text-[11px] text-gray-600">Tệp đính kèm</label>
+                <input type="file" name="attachments" multiple class="w-full text-xs text-gray-500 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                <div class="text-[9px] mt-1 text-gray-400">Hỗ trợ PDF, DOC, DOCX, JPG, PNG (tối đa 10MB)</div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-3 text-xs pt-4 border-t border-gray-200">
+                <a asp-action="Inbox" asp-controller="Documents" class="text-gray-600 text-xs hover:text-gray-900 focus:outline-none">Hủy</a>
+                <button class="rounded bg-blue-600 px-4 py-1 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600" type="submit">Gửi ngay</button>
+            </div>
+        </form>
+
+        @if (Model.RecentDocuments.Any())
+        {
+            <section class="mt-6 text-[11px] text-gray-700">
+                <h3 class="font-semibold mb-2">Văn bản đã gửi gần đây</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    @foreach (var doc in Model.RecentDocuments)
+                    {
+                        <div class="border border-blue-100 rounded p-3 bg-blue-50 text-blue-700">
+                            <div class="flex items-center space-x-1 mb-1">
+                                <i class="fas fa-info-circle text-blue-600"></i>
+                                <span class="font-semibold truncate">@doc.Title</span>
+                                <span class="text-[9px] text-gray-400">@doc.CreatedAt?.ToString("dd/MM")</span>
+                            </div>
+                            <a asp-controller="Documents" asp-action="Details" asp-route-id="@doc.Id" class="mt-2 bg-blue-100 text-blue-700 rounded px-2 py-[2px] text-[9px] font-semibold hover:bg-blue-200" type="button">Xem lại</a>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+    </main>
+</body>
+</html>

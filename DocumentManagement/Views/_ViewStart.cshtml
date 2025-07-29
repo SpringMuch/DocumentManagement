@@ -1,0 +1,12 @@
+﻿@{
+    // Nếu trang thuộc controller Account, dùng layout xác thực
+    if (ViewContext.RouteData.Values["controller"]?.ToString() == "Account")
+    {
+        Layout = "_Layout_Auth";
+    }
+    // Ngược lại, dùng layout chính của ứng dụng
+    else
+    {
+        Layout = "_Layout";
+    }
+}
