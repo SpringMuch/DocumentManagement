@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Dịch vụ ứng dụng ASP.NET Core
+  app:
+    build: .
+    container_name: DocumentManagement
+    ports:
+      - "8000:8080" # Map cổng 8000 của máy bạn vào cổng 8080 của container
+      - "8001:8081"
+    environment:
+      # QUAN TRỌNG: Sửa lại ConnectionString để trỏ đến service 'db'
+      - ConnectionStrings__DefaultConnection=Server=db;Database=DocumentManagement;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
+      - ASPNETCORE_URLS=https://+:8081;http://+:8080
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${PFX_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+      - ~/.aspnet/https:/https/:ro # Map chứng chỉ HTTPS của .NET vào container
+    depends_on:
+      - db
+
+  # Dịch vụ SQL Server
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: quanlycongvan_db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SA_PASSWORD} # Lấy mật khẩu từ file .env
+    ports:
+      - "1433:1433" # Map cổng 1433 để có thể kết nối từ SSMS
+    volumes:
+      - mssql-data:/var/opt/mssql
+
+  # Dịch vụ Prometheus để thu thập metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml # Map file cấu hình
+    ports:
+      - "9090:9090"
+    depends_on:
+      - app
+
+  # Dịch vụ Grafana để hiển thị dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+volumes:
+  mssql-data:
+  grafana-data:

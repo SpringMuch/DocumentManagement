@@ -1,6 +1,7 @@
-using DocumentManagement.Data;
+﻿using DocumentManagement.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,10 +35,17 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Thêm dòng này để thu thập HTTP request metrics
+app.UseHttpMetrics();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Thêm dòng này để tạo endpoint /metrics cho Prometheus
+app.MapMetrics();
 
 app.Run();
