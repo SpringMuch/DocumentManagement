@@ -10,22 +10,22 @@ pipeline {
         stage('Restore Packages') {
             steps {
                 echo 'Restoring .NET packages on agent...'
-                // Sử dụng 'sh' vì container Jenkins là Linux
-                sh 'dotnet restore DocumentManagement.sln'
+                // Sử dụng 'bat' vì Jenkins đang chạy trên Windows
+                bat 'dotnet restore DocumentManagement.sln'
             }
         }
 
         stage('Build Project') {
             steps {
                 echo 'Building the project on agent...'
-                sh 'dotnet build DocumentManagement.sln --configuration Release --no-restore'
+                bat 'dotnet build DocumentManagement.sln --configuration Release --no-restore'
             }
         }
 
         stage('Run Tests') {
             steps {
                 echo 'Running tests...'
-                sh 'dotnet test DocumentManagement.sln --no-build --verbosity normal'
+                bat 'dotnet test DocumentManagement.sln --no-build --verbosity normal'
             }
         }
 
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 echo 'Building the Docker image using docker-compose...'
                 // Docker sẽ tận dụng cache từ các bước build trước nên sẽ rất nhanh
-                sh 'docker-compose build'
+                bat 'docker-compose build'
             }
         }
 
@@ -43,8 +43,8 @@ pipeline {
             steps {
                 echo 'Deploying all services (app, db, prometheus, grafana)...'
                 // Dừng các container cũ và khởi động lại với image mới
-                sh 'docker-compose down'
-                sh 'docker-compose up -d'
+                bat 'docker-compose down'
+                bat 'docker-compose up -d'
             }
         }
     }
