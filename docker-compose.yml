@@ -12,6 +12,7 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
     volumes:
       - C:/Users/phamh/.aspnet/https/aspnetapp.pfx:/https/aspnetapp.pfx:ro
+      - attachments-data:/app/wwwroot/attachments
     depends_on:
       - db
 
@@ -45,3 +46,5 @@ services:
 volumes:
   mssql-data:
   grafana-data:
+  attachments-data:
+  
