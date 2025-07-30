@@ -13,8 +13,7 @@ services:
     volumes:
       - C:/Users/phamh/.aspnet/https/aspnetapp.pfx:/https/aspnetapp.pfx:ro
     depends_on:
-      - db:
-          condition: service_healthy
+      - db
 
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -26,12 +25,6 @@ services:
       - "1433:1433"
     volumes:
       - mssql-data:/var/opt/mssql
-    healthcheck:
-      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${SA_PASSWORD}", "-Q", "SELECT 1"]
-      interval: 10s
-      retries: 5
-      start_period: 10s
-      timeout: 5s
 
   prometheus:
     image: prom/prometheus:latest
