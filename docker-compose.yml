@@ -11,10 +11,7 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${PFX_PASSWORD}
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
     volumes:
-      # === THAY ĐỔI Ở ĐÂY ===
-      # Thay vì map cả thư mục, chúng ta map trực tiếp file .pfx
-      # Docker Compose trên Windows sẽ tự động thay thế ${USERPROFILE} bằng đường dẫn C:\Users\<tên_của_bạn>
-      - ${USERPROFILE}/.aspnet/https/aspnetapp.pfx:/https/aspnetapp.pfx:ro
+      - C:/Users/phamh/.aspnet/https/aspnetapp.pfx:/https/aspnetapp.pfx:ro
     depends_on:
       - db
 
